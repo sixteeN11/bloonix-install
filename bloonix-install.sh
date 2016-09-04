@@ -18,15 +18,9 @@ else
 fi
 
 install_dependencies() {
-<<<<<<< HEAD
   apt-get -qq remove apt-listchanges
   apt-get -qq update
   apt-get -qq install apt-transport-https ca-certificates pwgen curl openjdk-7-jre
-=======
-  apt-get -qq -y remove apt-listchanges
-  apt-get -qq -y update
-  apt-get -qq -y install apt-transport-https ca-certificates pwgen
->>>>>>> origin/master
 }
 
 bloonix_repository() {
@@ -40,13 +34,8 @@ elasticsearch_repository() {
   # Adding elasticsearch-Repository
   wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | apt-key add -
   echo "deb https://packages.elastic.co/elasticsearch/2.x/debian stable main" >> /etc/apt/sources.list.d/elasticsearch.list
-<<<<<<< HEAD
   apt-get -qq update
   apt-get -qq install elasticsearch
-=======
-  apt-get -qq -y update
-  apt-get -qq -y install elasticsearch
->>>>>>> origin/master
 }
 
 install_mysql_server() {
@@ -81,26 +70,14 @@ initialize_elasticsearch() {
 }
 
 install_bloonix_webgui() {
-<<<<<<< HEAD
   apt-get -qq install bloonix-webgui
   echo "include /etc/bloonix/webgui/nginx.conf;" > /etc/nginx/conf.d/bloonix.conf
   service nginx restart
-=======
-  apt-get -qq -y install bloonix-webgui
-  echo "include /etc/bloonix/webgui/nginx.conf;" > /etc/bloonix/webgui/nginx.conf
-  service nginx restart
-  initialize_mysql_database
-  initialize_elasticsearch
->>>>>>> origin/master
   service bloonix-webgui restart
 }
 
 install_bloonix_server() {
-<<<<<<< HEAD
   apt-get -qq install bloonix-server
-=======
-  apt-get -qq -y install bloonix-server
->>>>>>> origin/master
   service bloonix-server restart
 }
 
@@ -110,12 +87,7 @@ install_bloonix_plugins() {
 }
 
 install_bloonix_agent() {
-<<<<<<< HEAD
   apt-get -qq install bloonix-agent
-=======
-  apt-get -qq -y install bloonix-agent
-  service bloonix-agent restart
->>>>>>> origin/master
 }
 
 install_dependencies
