@@ -12,9 +12,9 @@ else
 fi
 
 install_dependencies() {
-  apt-get -qq -y remove apt-listchanges
-  apt-get -qq -y update
-  apt-get -qq -y install apt-transport-https ca-certificates pwgen
+  apt-get -qqqq -y remove apt-listchanges
+  apt-get -qqqq -y update
+  apt-get -qqqq -y install apt-transport-https ca-certificates pwgen
 }
 
 bloonix_repository() {
@@ -35,8 +35,8 @@ install_mysql-server() {
   # Installating MySQL-Server from debian-repositories and setting root password
   export DEBIAN_FRONTEND="noninteractive"
   MYSQL_PASSWORD=`pwgen 12`
-  debconf-set-selections <<< 'mysql-server mysql-server/root_password $MYSQL_PASSWORD $MYSQL_PASSWORD'
-  debconf-set-selections <<< 'mysql-server mysql-server/root_password_again $MYSQL_PASSWORD $MYSQL_PASSWORD'
+  debconf-set-selections <<< 'mysql-server mysql-server/root_password password $MYSQL_PASSWORD'
+  debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password $MYSQL_PASSWORD'
   apt-get -qq -y install mysql-server
   echo $MYSQL_PASSWORD > /root/MYSQL_PASSWORD.txt
 }
