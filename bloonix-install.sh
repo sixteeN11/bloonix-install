@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Simple check if this is a debian based distribution
-if [ -f /etc/ddsadebian_version ]; then
+if [ -f /etc/debian_version ]; then
   echo -e "Starting Bloonix-Installation..."
+  echo -e "Please be patient."
 else
   echo -e "This is not a debian based distribution!"
   echo -e "Please use this script only on debian based distributions."
@@ -30,11 +31,14 @@ function elasticsearch_repository {
 
 function install_mysql-server {
   # Installating MySQL-Server from debian-repositories and setting root password
-  MYSQL_PASSWORD=`pwgen 12`
-  debconf-set-selections <<< 'mysql-server mysql-server/root_password $MYSQL_PASSWORD $MYSQL_PASSWORD'
-  debconf-set-selections <<< 'mysql-server mysql-server/root_password_again $MYSQL_PASSWORD $MYSQL_PASSWORD'
+  export DEBIAN_FRONTEND="noninteractive"
   apt-get install -y  mysql-server
-  echo $MYSQL_PASSWORD > /root/MYSQL_PASSWORD.txt
+}
+
+function set_mysql_root_pw {
+  MYSQL_PW=`pwgen 12`
+  mysqladmin -u root password $MYSQL_PW
+  echo $MYSQL_PW > /root/MYSQL_PASSWORD.txt
 }
 
 function install_nginx {
@@ -43,10 +47,12 @@ function install_nginx {
 }
 
 function initialize_mysql_database {
+  # Initialize MySQL-Database schema
   /srv/bloonix/webgui/schema/init-database --mysql
 }
 
 function initialize_elasticsearch {
+  # Initialize Elasticsearch-Schema
   /srv/bloonix/webgui/schema/init-elasticsearch localhost:9200
 }
 
@@ -72,3 +78,21 @@ function install_bloonix_plugins {
 function install_bloonix_agent {
   apt-get install -y bloonix-agent
 }
+
+install_dependencies
+bloonix-repository
+elasticsearch_repository
+install_mysql-server
+install_nginx
+initialize_mysql_database
+set_mysql_root_pw
+initialize_elasticsearch
+install_bloonix_webgui
+install_bloonix_server
+install_bloonix_plugins
+install_bloonix_agent
+
+echo -e "Your bloonix-instance should be up and running."
+echo -e "Please check with your browser."
+echo -e "Initial Login for Bloonix is: admin/admin"
+echo -e "Happy monitoring!"
