@@ -107,4 +107,5 @@ service bloonix-webgui restart
 echo -e "Your bloonix-instance should be up and running."
 echo -e "Please check with your browser."
 echo -e "Initial Login for Bloonix is: admin/admin"
+echo -e "For further documentation on Bloonix please look at https://bloonix.org/de/docs/about/about.html"
 echo -e "Happy monitoring!"
