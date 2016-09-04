@@ -11,10 +11,12 @@ Have fun!
 ## Usage
 
 Simply clone this repository or download the zip-folder to your server, set the executable bit
-```chmod +x bloonix-install.sh
+```sh
+chmod +x bloonix-install.sh
 ```
 and run it
-```bloonix-install.sh
+```sh
+bloonix-install.sh
 ```
 
 That's it. Bloonix should be up and running on your routed domain. Initial login is admin/admin.
