@@ -12,6 +12,7 @@ else
 fi
 
 install_dependencies() {
+  apt-get -qq -y remove apt-listchanges
   apt-get -qq -y update
   apt-get -qq -y install apt-transport-https ca-certificates pwgen
 }
@@ -33,7 +34,11 @@ elasticsearch_repository() {
 install_mysql-server() {
   # Installating MySQL-Server from debian-repositories and setting root password
   export DEBIAN_FRONTEND="noninteractive"
-  apt-get -qq -y install  mysql-server
+  MYSQL_PASSWORD=`pwgen 12`
+  debconf-set-selections <<< 'mysql-server mysql-server/root_password $MYSQL_PASSWORD $MYSQL_PASSWORD'
+  debconf-set-selections <<< 'mysql-server mysql-server/root_password_again $MYSQL_PASSWORD $MYSQL_PASSWORD'
+  apt-get -qq -y install mysql-server
+  echo $MYSQL_PASSWORD > /root/MYSQL_PASSWORD.txt
 }
 
 set_mysql_root_pw() {
@@ -43,12 +48,15 @@ set_mysql_root_pw() {
 }
 
 install_nginx() {
-  apt-get install -y nginx
+  apt-get -qq -y install  nginx
   sed -i 's/.*server_names_hash_bucket_size.*/server_names_hash_bucket_size 64;/' /etc/nginx/nginx.conf
 }
 
 initialize_mysql_database() {
   # Initialize MySQL-Database schema
+  echo -e "!!! IMPORTANT !!!"
+  echo -e "This is the password for root: $MYSQL_PASSWORD"
+  echo -e "Please copy and paste it to the next step!"
   /srv/bloonix/webgui/schema/init-database --mysql
 }
 
@@ -84,11 +92,10 @@ install_dependencies
 bloonix_repository
 elasticsearch_repository
 install_mysql-server
+install_bloonix_webgui
 install_nginx
 initialize_mysql_database
-set_mysql_root_pw
 initialize_elasticsearch
-install_bloonix_webgui
 install_bloonix_server
 install_bloonix_plugins
 install_bloonix_agent
