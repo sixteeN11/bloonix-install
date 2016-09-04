@@ -1,3 +1,8 @@
+# CAUTION !!!!
+NOT FOR PRODUCTION USE
+
+PLEASE! DON'T USE THIS SCRIPT YET!
+
 # Bloonix-Install.sh
 
 Bloonix-Install.sh is a simple bash script to install the free and open-source monitoring-software [Bloonix](https://bloonix.org/) on Debian-based systems.
