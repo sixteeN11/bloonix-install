@@ -6,11 +6,9 @@
 # more information: https://github.com/dominicpratt/bloonix-install
 # Author: Dominic Pratt (https://dominicpratt.de)
 
-
 # init vars
 
 MYSQL_PASSWORD=""
-
 
 # Simple check if this is a debian based distribution
 if [ -f /etc/debian_version ]; then
@@ -103,9 +101,9 @@ initialize_mysql_database() {
 
 initialize_elasticsearch() {
   echo -en "Initialize Elasticsearch-Schema .. "
-  service elasticsearch start && \
-  sleep 10 && \
   sed -i'.bak' 's/.*network.host:.*/network.host: 127.0.0.1/' /etc/elasticsearch/elasticsearch.yml && \
+  service elasticsearch start && \
+  sleep 30 && \
   /srv/bloonix/webgui/schema/init-elasticsearch localhost:9200 > /dev/null
   if [ "$?" -ne 0 ]; then
     echo -e "failed."
