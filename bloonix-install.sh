@@ -6,6 +6,12 @@
 # more information: https://github.com/dominicpratt/bloonix-install
 # Author: Dominic Pratt (https://dominicpratt.de)
 
+
+# init vars
+
+MYSQL_PASSWORD=""
+
+
 # Simple check if this is a debian based distribution
 if [ -f /etc/debian_version ]; then
   echo -e "Starting Bloonix-Installation..."
@@ -18,76 +24,144 @@ else
 fi
 
 install_dependencies() {
-  apt-get -qq remove apt-listchanges
-  apt-get -qq update
-  apt-get -qq install apt-transport-https ca-certificates pwgen curl openjdk-7-jre
+  echo -en "Installing dependencies .. "
+  apt-get -qq remove apt-listchanges > /dev/null && \
+  apt-get -qq update > /dev/null && \
+  apt-get -qq install apt-transport-https ca-certificates pwgen curl openjdk-7-jre > /dev/null
+  if [ "$?" -ne 0 ]; then
+    echo -e "failed."
+    exit 1
+  else
+    echo -e "done."
+  fi
 }
 
 bloonix_repository() {
-  # Adding Bloonix-Repository
-  wget -q -O- https://download.bloonix.de/repos/debian/bloonix.gpg | apt-key add -
-  echo "deb https://download.bloonix.de/repos/debian/ jessie main" >> /etc/apt/sources.list.d/bloonix.list
+  echo -ne "Adding Bloonix-Repository .. "
+  wget -q -O- https://download.bloonix.de/repos/debian/bloonix.gpg | apt-key add - > /dev/null && \
+  echo "deb https://download.bloonix.de/repos/debian/ jessie main" >> /etc/apt/sources.list.d/bloonix.list && \
   apt-get -qq update
+  if [ "$?" -ne 0 ]; then
+    echo -e "failed."
+    exit 1
+  else
+    echo -e "done."
+  fi
 }
 
 elasticsearch_repository() {
-  # Adding elasticsearch-Repository
-  wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | apt-key add -
-  echo "deb https://packages.elastic.co/elasticsearch/2.x/debian stable main" >> /etc/apt/sources.list.d/elasticsearch.list
-  apt-get -qq update
-  apt-get -qq install elasticsearch
+  echo -ne "Adding elasticsearch-Repository .. "
+  wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | apt-key add - > /dev/null && \
+  echo "deb https://packages.elastic.co/elasticsearch/2.x/debian stable main" >> /etc/apt/sources.list.d/elasticsearch.list && \
+  apt-get -qq update && \
+  apt-get -qq install elasticsearch > /dev/null
+  if [ "$?" -ne 0 ]; then
+    echo -e "failed."
+    exit 1
+  else
+    echo -e "done."
+  fi
 }
 
 install_mysql_server() {
-  # Installating MySQL-Server from debian-repositories and setting root password
+  echo -en "Installating MySQL-Server from debian-repositories and setting root password .. "
   MYSQL_PASSWORD=`pwgen 12`
-  echo mysql-server mysql-server/root_password password $MYSQL_PASSWORD | debconf-set-selections
-  echo mysql-server mysql-server/root_password_again password $MYSQL_PASSWORD | debconf-set-selections
-  apt-get -qq install mysql-server
-  echo $MYSQL_PASSWORD > /root/MYSQL_PASSWORD.txt
+  echo mysql-server mysql-server/root_password password $MYSQL_PASSWORD | debconf-set-selections && \
+  echo mysql-server mysql-server/root_password_again password $MYSQL_PASSWORD | debconf-set-selections && \
+  apt-get -qq install mysql-server > /dev/null
+  if [ "$?" -ne 0 ]; then
+    echo -e "failed."
+    exit 1
+  else
+    echo -e "done."
+  fi
+ echo $MYSQL_PASSWORD > /root/MYSQL_PASSWORD.txt
 }
 
 install_nginx() {
-  apt-get -qq install nginx
-  sed -i 's/.*server_names_hash_bucket_size.*/server_names_hash_bucket_size 64;/' /etc/nginx/nginx.conf
+  echo -en "Installing nginx .. "
+  apt-get -qq install nginx > /dev/null && \
+  sed -i'.bak' 's/.*server_names_hash_bucket_size.*/server_names_hash_bucket_size 64;/' /etc/nginx/nginx.conf
+  if [ "$?" -ne 0 ]; then
+    echo -e "failed."
+    exit 1
+  else
+    echo -e "done."
+  fi
 }
 
 initialize_mysql_database() {
-  # Initialize MySQL-Database schema
-  echo -e ""
-  echo -e "!!! IMPORTANT !!!"
-  echo -e "This is the password for mysql-root: $MYSQL_PASSWORD"
-  echo -e "Please copy and paste it to the next step!"
-  /srv/bloonix/webgui/schema/init-database --mysql
+  echo -en "Initialize MySQL-Database schema .. "
+  echo "${MYSQL_PASSWORD}" | /srv/bloonix/webgui/schema/init-database --mysql > /dev/null
+  if [ "$?" -ne 0 ]; then
+    echo -e "failed."
+    exit 1
+  else
+    echo -e "done."
+  fi
 }
 
 initialize_elasticsearch() {
-  # Initialize Elasticsearch-Schema
-  service elasticsearch start
-  sleep 10
-  sed -i 's/.*network.host:.*/network.host: 127.0.0.1/' /etc/elasticsearch/elasticsearch.yml
-  /srv/bloonix/webgui/schema/init-elasticsearch localhost:9200
+  echo -en "Initialize Elasticsearch-Schema .. "
+  service elasticsearch start && \
+  sleep 10 && \
+  sed -i'.bak' 's/.*network.host:.*/network.host: 127.0.0.1/' /etc/elasticsearch/elasticsearch.yml && \
+  /srv/bloonix/webgui/schema/init-elasticsearch localhost:9200 > /dev/null
+  if [ "$?" -ne 0 ]; then
+    echo -e "failed."
+    exit 1
+  else
+    echo -e "done."
+  fi
 }
 
 install_bloonix_webgui() {
-  apt-get -qq install bloonix-webgui
-  echo "include /etc/bloonix/webgui/nginx.conf;" > /etc/nginx/conf.d/bloonix.conf
-  service nginx restart
+  echo -en "Install Bloonix WebGUI .. "
+  apt-get -qq install bloonix-webgui > /dev/null && \
+  echo "include /etc/bloonix/webgui/nginx.conf;" > /etc/nginx/conf.d/bloonix.conf && \
+  service nginx restart && \
   service bloonix-webgui restart
+  if [ "$?" -ne 0 ]; then
+    echo -e "failed."
+    exit 1
+  else
+    echo -e "done."
+  fi
 }
 
 install_bloonix_server() {
-  apt-get -qq install bloonix-server
+  echo -en "Install Bloonix Server .. "
+  apt-get -qq install bloonix-server > /dev/null && \
   service bloonix-server restart
+  if [ "$?" -ne 0 ]; then
+    echo -e "failed."
+    exit 1
+  else
+    echo -e "done."
+  fi
 }
 
 install_bloonix_plugins() {
-  apt-get -qq install bloonix-plugins-* bloonix-plugin-config
-  bloonix-load-plugins --load-all
+  echo -en "Install all Bloonix Plugins and load them .. "
+  apt-get -qq install bloonix-plugins-* bloonix-plugin-config > /dev/null && \
+  bloonix-load-plugins --load-all > /dev/null
+  if [ "$?" -ne 0 ]; then
+    echo -e "failed."
+    exit 1
+  else
+    echo -e "done."
+  fi
 }
 
 install_bloonix_agent() {
-  apt-get -qq install bloonix-agent
+  echo -en "Install Bloonix Agent .. "
+  apt-get -qq install bloonix-agent > /dev/null
+  if [ "$?" -ne 0 ]; then
+    echo -e "failed."
+    exit 1
+  else
+    echo -e "done."
+  fi
 }
 
 install_dependencies
