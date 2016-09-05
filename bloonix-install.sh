@@ -178,6 +178,10 @@ service bloonix-webgui restart
 
 echo -e "Your bloonix-instance should be up and running."
 echo -e "Please check with your browser."
+echo -e ""
 echo -e "Initial Login for Bloonix is: admin/admin"
+echo -e ""
 echo -e "For further documentation on Bloonix please look at https://bloonix.org/de/docs/about/about.html"
+echo -e ""
+echo -e "Your root password for MySQL is "\"$MYSQL_PASSWORD\" "and is saved to /root/MYSQL_PASSWORD.txt"
 echo -e "Happy monitoring!"
