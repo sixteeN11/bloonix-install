@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version 1.1
+# Version 1.1.1
 # This small script automates the installation
 # of the bloonix monitoring-suite
 # more information: https://github.com/dominicpratt/bloonix-install
