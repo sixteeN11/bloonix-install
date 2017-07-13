@@ -6,6 +6,7 @@ This script is in heavy development and I'd be happy about pull requests and/or 
 
 **Tested on**:
   - Debian 8 (Jessie)
+  - Debian 9 (Stretch)
 
 But it should run on all debian-based distributions such as Ubuntu or elementary OS.
 

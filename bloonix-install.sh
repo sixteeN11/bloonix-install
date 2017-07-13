@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version 1.0
+# Version 1.1
 # This small script automates the installation
 # of the bloonix monitoring-suite
 # more information: https://github.com/dominicpratt/bloonix-install
@@ -25,7 +25,7 @@ install_dependencies() {
   echo -en "Installing dependencies .. "
   apt-get -qq remove apt-listchanges > /dev/null && \
   apt-get -qq update > /dev/null && \
-  apt-get -qq install apt-transport-https ca-certificates pwgen curl openjdk-7-jre > /dev/null
+  apt-get -qq install apt-transport-https ca-certificates pwgen curl openjdk-8-jre lsb-release > /dev/null
   if [ "$?" -ne 0 ]; then
     echo -e "failed."
     exit 1
@@ -37,7 +37,7 @@ install_dependencies() {
 bloonix_repository() {
   echo -ne "Adding Bloonix-Repository .. "
   wget -q -O- https://download.bloonix.de/repos/debian/bloonix.gpg | apt-key add - > /dev/null && \
-  echo "deb https://download.bloonix.de/repos/debian/ jessie main" >> /etc/apt/sources.list.d/bloonix.list && \
+  echo "deb https://download.bloonix.de/repos/debian/ `lsb_release --codename | cut -f2` main" >> /etc/apt/sources.list.d/bloonix.list && \
   apt-get -qq update
   if [ "$?" -ne 0 ]; then
     echo -e "failed."
