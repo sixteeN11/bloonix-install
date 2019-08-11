@@ -25,7 +25,7 @@ install_dependencies() {
   echo -en "Installing dependencies .. "
   apt-get -qq remove apt-listchanges > /dev/null && \
   apt-get -qq update > /dev/null && \
-  apt-get -qq install apt-transport-https ca-certificates pwgen curl ca-certificates-java lsb-release > /dev/null
+  apt-get -qq install apt-transport-https ca-certificates pwgen curl openjdk-8-jdk lsb-release > /dev/null
   if [ "$?" -ne 0 ]; then
     echo -e "failed."
     exit 1
